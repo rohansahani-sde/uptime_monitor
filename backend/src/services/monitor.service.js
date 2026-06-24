@@ -1,4 +1,7 @@
 const Monitor = require('../models/Monitor');
+const Incident = require('../models/Incident');
+const CheckHistory = require('../models/CheckHistory');
+const Notification = require('../models/Notification');
 const { config } = require('../config/env');
 const { AppError } = require('../middleware/errorHandler');
 
@@ -68,7 +71,13 @@ const updateMonitor = async (monitorId, userId, data, plan) => {
 const deleteMonitor = async (monitorId, userId) => {
   const monitor = await Monitor.findOne({ _id: monitorId, userId });
   if (!monitor) throw new AppError('Monitor not found.', 404);
-  await Monitor.findByIdAndDelete(monitorId);
+
+  await Promise.all([
+    Monitor.findByIdAndDelete(monitorId),
+    Incident.deleteMany({ monitorId }),
+    CheckHistory.deleteMany({ monitorId }),
+    Notification.deleteMany({ monitorId }),
+  ]);
 };
 
 const pauseMonitor = async (monitorId, userId) => {

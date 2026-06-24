@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Monitor = require('../models/Monitor');
 const Incident = require('../models/Incident');
 const Subscription = require('../models/Subscription');
+const CheckHistory = require('../models/CheckHistory');
+const Notification = require('../models/Notification');
 const analyticsService = require('../services/analytics.service');
 const { AppError } = require('../middleware/errorHandler');
 
@@ -28,12 +30,13 @@ const deleteUser = async (req, res, next) => {
     if (!user) throw new AppError('User not found', 404);
     if (user.role === 'admin') throw new AppError('Cannot delete admin users', 403);
 
-    // Cascade delete monitors and incidents
+    // Cascade delete monitors, incidents, check histories, notifications, and subscription
     const monitors = await Monitor.find({ userId: user._id });
-    const monitorIds = monitors.map(m => m._id);
     await Promise.all([
       Monitor.deleteMany({ userId: user._id }),
-      Incident.deleteMany({ monitorId: { $in: monitorIds } }),
+      Incident.deleteMany({ userId: user._id }),
+      CheckHistory.deleteMany({ userId: user._id }),
+      Notification.deleteMany({ userId: user._id }),
       Subscription.deleteOne({ userId: user._id }),
     ]);
     await User.findByIdAndDelete(req.params.id);

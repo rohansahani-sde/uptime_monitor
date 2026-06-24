@@ -9,7 +9,7 @@ const connectDB = require('./src/config/db');
 const logger = require('./src/config/logger');
 const { apiLimiter } = require('./src/middleware/rateLimiter');
 const { errorHandler, notFound } = require('./src/middleware/errorHandler');
-const { startScheduler } = require('./src/engine/scheduler');
+const { startScheduler, stopScheduler } = require('./src/engine/scheduler');
 
 // Route imports
 const authRoutes = require('./src/routes/auth.routes');
@@ -87,6 +87,7 @@ const startServer = async () => {
     // Graceful shutdown
     const shutdown = (signal) => {
       logger.info(`${signal} received. Shutting down gracefully...`);
+      stopScheduler();
       server.close(() => {
         logger.info('HTTP server closed');
         process.exit(0);

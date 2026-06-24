@@ -9,7 +9,7 @@ const Subscription = require('../models/Subscription');
 const checkMonitorLimit = async (req, res, next) => {
   try {
     const user = req.user;
-    const planConfig = config.plans[user.plan] || config.plans.free;
+    const planConfig = user.role === 'admin' ? config.plans.admin : (config.plans[user.plan] || config.plans.free);
 
     const existingCount = await Monitor.countDocuments({ userId: user._id, isPaused: false });
     // Count all monitors (paused or active) for limit enforcement
@@ -37,7 +37,7 @@ const checkMonitorLimit = async (req, res, next) => {
 const checkIntervalAllowed = async (req, res, next) => {
   try {
     const user = req.user;
-    const planConfig = config.plans[user.plan] || config.plans.free;
+    const planConfig = user.role === 'admin' ? config.plans.admin : (config.plans[user.plan] || config.plans.free);
     const requestedInterval = parseInt(req.body.interval, 10);
 
     if (requestedInterval && !planConfig.allowedIntervals.includes(requestedInterval)) {
