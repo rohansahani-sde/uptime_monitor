@@ -29,6 +29,7 @@ import UserManagement from './pages/Admin/UserManagement'
 // Public
 import PublicStatusPage from './pages/Status/PublicStatusPage'
 import NotFound from './pages/NotFound'
+import LandingPage from './pages/LandingPage'
 
 export default function App() {
   return (
@@ -67,8 +68,8 @@ export default function App() {
             </Route>
           </Route>
 
-          {/* Root redirect */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Root page */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
