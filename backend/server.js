@@ -30,8 +30,14 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+if (config.clientUrl) {
+  const urls = config.clientUrl.split(',').map(url => url.trim());
+  allowedOrigins.push(...urls);
+}
+
 app.use(cors({
-  origin: [config.clientUrl, 'http://localhost:5173', 'http://localhost:3000'],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
